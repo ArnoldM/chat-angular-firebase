@@ -32,7 +32,7 @@ export const FIRESTORE = new InjectionToken('Firebase firestore', {
   providedIn: 'root',
   factory: () => {
     let firestore: Firestore;
-
+    console.log('environment', environment);
     if (environment.useEmulators) {
       firestore = initializeFirestore(app, {});
       connectFirestoreEmulator(firestore, 'localhost', 8080);
