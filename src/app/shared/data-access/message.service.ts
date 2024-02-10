@@ -1,9 +1,19 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { query, collection, orderBy, limit } from 'firebase/firestore';
+import { query, collection, orderBy, limit, addDoc } from 'firebase/firestore';
 import { collectionData } from 'rxfire/firestore';
 import { connect } from 'ngxtension/connect';
 
-import { map, merge, Observable } from 'rxjs';
+import {
+  catchError,
+  defer,
+  exhaustMap,
+  ignoreElements,
+  map,
+  merge,
+  Observable,
+  of,
+  Subject,
+} from 'rxjs';
 
 import { FIRESTORE } from '../../app.config';
 import { Message } from '../interfaces/messages';
@@ -21,6 +31,7 @@ export class MessageService {
 
   // source
   message$ = this.getMessages();
+  add$ = new Subject<Message['content']>();
 
   // state
   private state = signal<MessageState>({
@@ -35,11 +46,11 @@ export class MessageService {
   constructor() {
     // reducers
     const nextState$ = merge(
-      this.message$.pipe(
-        map((messages) => {
-          console.log('messages from service', messages);
-          return { messages };
-        }),
+      this.message$.pipe(map((messages) => ({ messages }))),
+      this.add$.pipe(
+        exhaustMap((message) => this.addMessage(message)),
+        ignoreElements(),
+        catchError((error) => of({ error })),
       ),
     );
 
@@ -56,5 +67,16 @@ export class MessageService {
     return collectionData(messagesCollection, { idField: 'id' }).pipe(
       map((messages) => [...messages].reverse()),
     ) as Observable<Message[]>;
+  }
+
+  private addMessage(message: string) {
+    const newMessage: Message = {
+      author: 'me@test.com',
+      content: message,
+      created: Date.now().toString(),
+    };
+
+    const messagesCollection = collection(this.firestore, 'messages');
+    return defer(() => addDoc(messagesCollection, newMessage));
   }
 }
