@@ -1,4 +1,4 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MessageListComponent } from './ui/message-list.component';
 import { MessageService } from '../shared/data-access/message.service';
 import { InputMessageComponent } from './ui/message-input.component';
@@ -20,10 +20,4 @@ import { InputMessageComponent } from './ui/message-input.component';
 })
 export default class HomeComponent {
   messageService = inject(MessageService);
-
-  constructor() {
-    effect(() => {
-      console.log('messages', this.messageService.messages());
-    });
-  }
 }
