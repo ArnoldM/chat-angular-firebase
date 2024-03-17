@@ -9,7 +9,7 @@ import { RouterLink } from '@angular/router';
   template: `
     <div class="container gradient-bg">
       <app-login-form
-        [status]="loginService.status()"
+        [loginStatus]="loginService.status()"
         (login)="loginService.loginUser$.next($event)"
       ></app-login-form>
       <a routerLink="/auth/register">Create account</a>
