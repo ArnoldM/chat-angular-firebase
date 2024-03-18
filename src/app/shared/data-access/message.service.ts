@@ -7,17 +7,20 @@ import {
   catchError,
   defer,
   exhaustMap,
+  filter,
   ignoreElements,
   map,
   merge,
   Observable,
   of,
+  retry,
   Subject,
 } from 'rxjs';
 
 import { FIRESTORE } from '../../app.config';
 import { Message } from '../interfaces/messages';
 import { AuthService } from './auth.service';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 interface MessageState {
   messages: Message[];
@@ -30,9 +33,15 @@ interface MessageState {
 export class MessageService {
   private firestore = inject(FIRESTORE);
   private authService = inject(AuthService);
+  private authUser$ = toObservable(this.authService.user);
 
   // source
-  message$ = this.getMessages();
+  message$ = this.getMessages().pipe(
+    // restart stream when user re-authenticates
+    retry({
+      delay: () => this.authUser$.pipe(filter((user) => !!user)),
+    }),
+  );
   add$ = new Subject<Message['content']>();
 
   // state

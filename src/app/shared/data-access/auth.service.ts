@@ -7,7 +7,7 @@ import {
   signOut,
   createUserWithEmailAndPassword,
 } from 'firebase/auth';
-import { defer, from, map, merge } from 'rxjs';
+import { defer, map, merge } from 'rxjs';
 import { connect } from 'ngxtension/connect';
 import { Credentials } from '../interfaces/credentials';
 
@@ -41,13 +41,11 @@ export class AuthService {
   }
 
   login(credentials: Credentials) {
-    return from(
-      defer(() =>
-        signInWithEmailAndPassword(
-          this.auth,
-          credentials.email,
-          credentials.password,
-        ),
+    return defer(() =>
+      signInWithEmailAndPassword(
+        this.auth,
+        credentials.email,
+        credentials.password,
       ),
     );
   }
@@ -57,13 +55,11 @@ export class AuthService {
   }
 
   createAccount(credentials: Credentials) {
-    return from(
-      defer(() =>
-        createUserWithEmailAndPassword(
-          this.auth,
-          credentials.email,
-          credentials.password,
-        ),
+    return defer(() =>
+      createUserWithEmailAndPassword(
+        this.auth,
+        credentials.email,
+        credentials.password,
       ),
     );
   }
