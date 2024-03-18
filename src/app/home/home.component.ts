@@ -22,12 +22,36 @@ import { MatIcon } from '@angular/material/icon';
 
       <app-message-list
         [messages]="messageService.messages()"
+        [activeUSer]="authService.user()"
       ></app-message-list>
       <app-message-input
         (send)="messageService.add$.next($event)"
       ></app-message-input>
     </div>
   `,
+  styles: [
+    `
+      .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100vh;
+      }
+
+      mat-toolbar {
+        z-index: 10;
+        box-shadow: 0px -7px 11px 0px var(--accent-color);
+      }
+
+      app-message-list {
+        overflow: hidden;
+        width: 100%;
+      }
+
+      app-message-input {
+      }
+    `,
+  ],
   imports: [
     MessageListComponent,
     InputMessageComponent,
